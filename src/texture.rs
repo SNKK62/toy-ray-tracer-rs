@@ -20,26 +20,40 @@ pub trait Texture {
 }
 
 #[derive(Debug, Clone)]
-pub enum TextureEnum {
-    SolidColor(SolidColor),
-    Checker(Checker),
-    NoiseTexture(NoiseTexture),
-    ImageTexture(ImageTexture),
+pub enum TextureKey {
+    SolidColor,
+    Checker,
+    NoiseTexture,
+    ImageTexture,
 }
 
-impl TextureEnum {
-    pub fn value(&self, u: f64, v: f64, p: &Vec3) -> Color {
-        match self {
-            TextureEnum::SolidColor(sc) => sc.value(u, v, p),
-            TextureEnum::Checker(c) => c.value(u, v, p),
-            TextureEnum::NoiseTexture(nt) => nt.value(u, v, p),
-            TextureEnum::ImageTexture(it) => it.value(u, v, p),
+// NOTE: This is a workaround for compiling into WASM
+#[derive(Debug, Clone)]
+pub struct TextureStruct {
+    pub key: TextureKey,
+    pub solid_color: Option<SolidColor>,
+    pub checker: Option<Checker>,
+    pub noise_texture: Option<NoiseTexture>,
+    pub image_texture: Option<ImageTexture>,
+}
+
+impl TextureStruct {
+    pub fn new(key: TextureKey) -> Self {
+        Self {
+            key,
+            solid_color: None,
+            checker: None,
+            noise_texture: None,
+            image_texture: None,
         }
     }
-}
 
-impl Texture for TextureEnum {
-    fn value(&self, u: f64, v: f64, p: &Vec3) -> Color {
-        self.value(u, v, p)
+    pub fn value(&self, u: f64, v: f64, p: &Vec3) -> Color {
+        match self.key {
+            TextureKey::SolidColor => self.solid_color.as_ref().unwrap().value(u, v, p),
+            TextureKey::Checker => self.checker.as_ref().unwrap().value(u, v, p),
+            TextureKey::NoiseTexture => self.noise_texture.as_ref().unwrap().value(u, v, p),
+            TextureKey::ImageTexture => self.image_texture.as_ref().unwrap().value(u, v, p),
+        }
     }
 }

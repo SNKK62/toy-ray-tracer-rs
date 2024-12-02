@@ -1,9 +1,9 @@
-use super::{surrounding_box, HitRecord, Hittable, HittableEnum, AABB};
+use super::{surrounding_box, HitRecord, Hittable, HittableStruct, AABB};
 use crate::{ray, vec3};
 
 #[derive(Debug, Clone)]
 pub struct HittableList {
-    pub objects: Vec<HittableEnum>,
+    pub objects: Vec<HittableStruct>,
 }
 
 impl Default for HittableList {
@@ -19,7 +19,7 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, object: HittableEnum) {
+    pub fn add(&mut self, object: HittableStruct) {
         self.objects.push(object);
     }
 

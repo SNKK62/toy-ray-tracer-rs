@@ -1,5 +1,5 @@
 use crate::hittable::{surrounding_box, HitRecord, Hittable, AABB};
-use crate::material::MaterialEnum;
+use crate::material::MaterialStruct;
 use crate::ray;
 use crate::vec3;
 
@@ -10,7 +10,7 @@ pub struct MovingSphere {
     time0: f64,
     time1: f64,
     radius: f64,
-    material: MaterialEnum,
+    material: MaterialStruct,
 }
 
 impl MovingSphere {
@@ -18,7 +18,7 @@ impl MovingSphere {
         center0: &vec3::Point3,
         center1: &vec3::Point3,
         radius: f64,
-        material: MaterialEnum,
+        material: MaterialStruct,
         time0: f64,
         time1: f64,
     ) -> Self {

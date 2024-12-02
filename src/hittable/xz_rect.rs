@@ -1,10 +1,10 @@
 use super::{HitRecord, Hittable, AABB};
-use crate::material::MaterialEnum;
+use crate::material::MaterialStruct;
 use crate::vec3::Vec3;
 
 #[derive(Debug, Clone)]
 pub struct XZRect {
-    mp: MaterialEnum,
+    mp: MaterialStruct,
     x0: f64,
     x1: f64,
     z0: f64,
@@ -13,7 +13,7 @@ pub struct XZRect {
 }
 
 impl XZRect {
-    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: MaterialEnum) -> Self {
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: MaterialStruct) -> Self {
         XZRect {
             mp: material,
             x0,

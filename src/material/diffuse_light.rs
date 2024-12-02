@@ -1,13 +1,13 @@
 pub use super::Material;
-pub use crate::texture::TextureEnum;
+pub use crate::texture::TextureStruct;
 
 #[derive(Debug, Clone)]
 pub struct DiffuseLight {
-    pub emit: TextureEnum,
+    pub emit: TextureStruct,
 }
 
 impl DiffuseLight {
-    pub fn new(emit: &TextureEnum) -> Self {
+    pub fn new(emit: &TextureStruct) -> Self {
         Self { emit: emit.clone() }
     }
 }

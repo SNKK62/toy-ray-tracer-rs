@@ -33,15 +33,37 @@ pub trait Material {
 }
 
 #[derive(Debug, Clone)]
-pub enum MaterialEnum {
-    Lambertian(Lambertian),
-    Metal(Metal),
-    Dielectric(Dielectric),
-    DiffuseLight(DiffuseLight),
-    Isotropic(Isotropic),
+pub enum MaterialKey {
+    Lambertian,
+    Metal,
+    Dielectric,
+    DiffuseLight,
+    Isotropic,
 }
 
-impl MaterialEnum {
+// NOTE: This is a workaround for compiling into WASM
+#[derive(Debug, Clone)]
+pub struct MaterialStruct {
+    pub key: MaterialKey,
+    pub lambertian: Option<Lambertian>,
+    pub metal: Option<Metal>,
+    pub dielectric: Option<Dielectric>,
+    pub diffuse_light: Option<DiffuseLight>,
+    pub isotropic: Option<Isotropic>,
+}
+
+impl MaterialStruct {
+    pub fn new(key: MaterialKey) -> Self {
+        Self {
+            key,
+            lambertian: None,
+            metal: None,
+            dielectric: None,
+            diffuse_light: None,
+            isotropic: None,
+        }
+    }
+
     pub fn scatter(
         &self,
         r_in: &ray::Ray,
@@ -49,36 +71,45 @@ impl MaterialEnum {
         attenuation: &mut vec3::Color,
         scattered: &mut ray::Ray,
     ) -> bool {
-        match self {
-            MaterialEnum::Lambertian(l) => l.scatter(r_in, rec, attenuation, scattered),
-            MaterialEnum::Metal(m) => m.scatter(r_in, rec, attenuation, scattered),
-            MaterialEnum::Dielectric(d) => d.scatter(r_in, rec, attenuation, scattered),
-            MaterialEnum::DiffuseLight(dl) => dl.scatter(r_in, rec, attenuation, scattered),
-            MaterialEnum::Isotropic(i) => i.scatter(r_in, rec, attenuation, scattered),
+        match self.key {
+            MaterialKey::Lambertian => {
+                self.lambertian
+                    .as_ref()
+                    .unwrap()
+                    .scatter(r_in, rec, attenuation, scattered)
+            }
+            MaterialKey::Metal => {
+                self.metal
+                    .as_ref()
+                    .unwrap()
+                    .scatter(r_in, rec, attenuation, scattered)
+            }
+            MaterialKey::Dielectric => {
+                self.dielectric
+                    .as_ref()
+                    .unwrap()
+                    .scatter(r_in, rec, attenuation, scattered)
+            }
+            MaterialKey::DiffuseLight => {
+                self.diffuse_light
+                    .as_ref()
+                    .unwrap()
+                    .scatter(r_in, rec, attenuation, scattered)
+            }
+            MaterialKey::Isotropic => {
+                self.isotropic
+                    .as_ref()
+                    .unwrap()
+                    .scatter(r_in, rec, attenuation, scattered)
+            }
         }
     }
 
     pub fn emitted(&self, u: f64, v: f64, p: &vec3::Point3) -> vec3::Color {
-        match self {
-            MaterialEnum::DiffuseLight(dl) => dl.emitted(u, v, p),
+        match self.key {
+            MaterialKey::DiffuseLight => self.diffuse_light.as_ref().unwrap().emitted(u, v, p),
             _ => vec3::Color::zero(),
         }
-    }
-}
-
-impl Material for MaterialEnum {
-    fn scatter(
-        &self,
-        r_in: &ray::Ray,
-        rec: &hittable::HitRecord,
-        attenuation: &mut vec3::Color,
-        scattered: &mut ray::Ray,
-    ) -> bool {
-        self.scatter(r_in, rec, attenuation, scattered)
-    }
-
-    fn emitted(&self, u: f64, v: f64, p: &vec3::Point3) -> vec3::Color {
-        self.emitted(u, v, p)
     }
 }
 

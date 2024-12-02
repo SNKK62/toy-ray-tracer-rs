@@ -1,16 +1,16 @@
 use super::Material;
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
-use crate::texture::TextureEnum;
+use crate::texture::TextureStruct;
 use crate::vec3::{Color, Vec3};
 
 #[derive(Debug, Clone)]
 pub struct Isotropic {
-    albedo: TextureEnum,
+    albedo: TextureStruct,
 }
 
 impl Isotropic {
-    pub fn new(albedo: &TextureEnum) -> Self {
+    pub fn new(albedo: &TextureStruct) -> Self {
         Self {
             albedo: albedo.clone(),
         }

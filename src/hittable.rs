@@ -57,7 +57,7 @@ fn get_sphere_uv(p: &vec3::Point3) -> (f64, f64) {
 pub struct HitRecord {
     pub p: vec3::Point3,
     pub normal: vec3::Vec3,
-    pub material: Option<material::MaterialEnum>,
+    pub material: Option<material::MaterialStruct>,
     pub t: f64,
     pub u: f64,
     pub v: f64,
@@ -99,67 +99,161 @@ pub trait Hittable {
 }
 
 #[derive(Debug, Clone)]
-pub enum HittableEnum {
-    HittableList(Box<HittableList>),
-    BvhNode(Box<BvhNode>),
-    Sphere(Sphere),
-    MovingSphere(MovingSphere),
-    XYRect(XYRect),
-    XZRect(XZRect),
-    YZRect(YZRect),
-    Cuboid(Cuboid),
-    Translation(Translation),
-    RotateX(Box<RotateX>),
-    RotateY(Box<RotateY>),
-    RotateZ(Box<RotateZ>),
-    ConstantMedium(Box<ConstantMedium>),
+pub enum HittableKey {
+    HittableList,
+    BvhNode,
+    Sphere,
+    MovingSphere,
+    XYRect,
+    XZRect,
+    YZRect,
+    Cuboid,
+    Translation,
+    RotateX,
+    RotateY,
+    RotateZ,
+    ConstantMedium,
 }
 
-impl HittableEnum {
+// NOTE: This is a workaround for compiling into WASM
+#[derive(Debug, Clone)]
+pub struct HittableStruct {
+    pub key: HittableKey,
+    pub hittable_list: Option<Box<HittableList>>,
+    pub bvh_node: Option<Box<BvhNode>>,
+    pub sphere: Option<Sphere>,
+    pub moving_sphere: Option<MovingSphere>,
+    pub xy_rect: Option<XYRect>,
+    pub xz_rect: Option<XZRect>,
+    pub yz_rect: Option<YZRect>,
+    pub cuboid: Option<Cuboid>,
+    pub translation: Option<Translation>,
+    pub rotate_x: Option<Box<RotateX>>,
+    pub rotate_y: Option<Box<RotateY>>,
+    pub rotate_z: Option<Box<RotateZ>>,
+    pub constant_medium: Option<Box<ConstantMedium>>,
+}
+
+impl HittableStruct {
+    pub fn new(key: HittableKey) -> Self {
+        Self {
+            key,
+            hittable_list: None,
+            bvh_node: None,
+            sphere: None,
+            moving_sphere: None,
+            xy_rect: None,
+            xz_rect: None,
+            yz_rect: None,
+            cuboid: None,
+            translation: None,
+            rotate_x: None,
+            rotate_y: None,
+            rotate_z: None,
+            constant_medium: None,
+        }
+    }
+
     pub fn hit(&self, r: &ray::Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        match self {
-            HittableEnum::HittableList(h) => h.hit(r, t_min, t_max, rec),
-            HittableEnum::BvhNode(b) => b.hit(r, t_min, t_max, rec),
-            HittableEnum::Sphere(s) => s.hit(r, t_min, t_max, rec),
-            HittableEnum::MovingSphere(s) => s.hit(r, t_min, t_max, rec),
-            HittableEnum::XYRect(rect) => rect.hit(r, t_min, t_max, rec),
-            HittableEnum::XZRect(rect) => rect.hit(r, t_min, t_max, rec),
-            HittableEnum::YZRect(rect) => rect.hit(r, t_min, t_max, rec),
-            HittableEnum::Cuboid(c) => c.hit(r, t_min, t_max, rec),
-            HittableEnum::Translation(t) => t.hit(r, t_min, t_max, rec),
-            HittableEnum::RotateX(rotate) => rotate.hit(r, t_min, t_max, rec),
-            HittableEnum::RotateY(rotate) => rotate.hit(r, t_min, t_max, rec),
-            HittableEnum::RotateZ(rotate) => rotate.hit(r, t_min, t_max, rec),
-            HittableEnum::ConstantMedium(c) => c.hit(r, t_min, t_max, rec),
+        match self.key {
+            HittableKey::HittableList => self
+                .hittable_list
+                .as_ref()
+                .unwrap()
+                .hit(r, t_min, t_max, rec),
+            HittableKey::BvhNode => self.bvh_node.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::Sphere => self.sphere.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::MovingSphere => self
+                .moving_sphere
+                .as_ref()
+                .unwrap()
+                .hit(r, t_min, t_max, rec),
+            HittableKey::XYRect => self.xy_rect.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::XZRect => self.xz_rect.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::YZRect => self.yz_rect.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::Cuboid => self.cuboid.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::Translation => {
+                self.translation.as_ref().unwrap().hit(r, t_min, t_max, rec)
+            }
+            HittableKey::RotateX => self.rotate_x.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::RotateY => self.rotate_y.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::RotateZ => self.rotate_z.as_ref().unwrap().hit(r, t_min, t_max, rec),
+            HittableKey::ConstantMedium => self
+                .constant_medium
+                .as_ref()
+                .unwrap()
+                .hit(r, t_min, t_max, rec),
         }
     }
 
     pub fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AABB) -> bool {
-        match self {
-            HittableEnum::HittableList(h) => h.bounding_box(time0, time1, output_box),
-            HittableEnum::BvhNode(b) => b.bounding_box(time0, time1, output_box),
-            HittableEnum::Sphere(s) => s.bounding_box(time0, time1, output_box),
-            HittableEnum::MovingSphere(s) => s.bounding_box(time0, time1, output_box),
-            HittableEnum::XYRect(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::XZRect(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::YZRect(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::Cuboid(c) => c.bounding_box(time0, time1, output_box),
-            HittableEnum::Translation(t) => t.bounding_box(time0, time1, output_box),
-            HittableEnum::RotateX(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::RotateY(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::RotateZ(r) => r.bounding_box(time0, time1, output_box),
-            HittableEnum::ConstantMedium(c) => c.bounding_box(time0, time1, output_box),
+        match self.key {
+            HittableKey::HittableList => self
+                .hittable_list
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::BvhNode => self
+                .bvh_node
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::Sphere => self
+                .sphere
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::MovingSphere => self
+                .moving_sphere
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::XYRect => self
+                .xy_rect
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::XZRect => self
+                .xz_rect
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::YZRect => self
+                .yz_rect
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::Cuboid => self
+                .cuboid
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::Translation => self
+                .translation
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::RotateX => self
+                .rotate_x
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::RotateY => self
+                .rotate_y
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::RotateZ => self
+                .rotate_z
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
+            HittableKey::ConstantMedium => self
+                .constant_medium
+                .as_ref()
+                .unwrap()
+                .bounding_box(time0, time1, output_box),
         }
-    }
-}
-
-impl Hittable for HittableEnum {
-    fn hit(&self, r: &ray::Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool {
-        self.hit(r, t_min, t_max, rec)
-    }
-
-    fn bounding_box(&self, time0: f64, time1: f64, output_box: &mut AABB) -> bool {
-        self.bounding_box(time0, time1, output_box)
     }
 }
 

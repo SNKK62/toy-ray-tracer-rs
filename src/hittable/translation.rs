@@ -1,4 +1,4 @@
-use super::{HitRecord, Hittable, HittableEnum, AABB};
+use super::{HitRecord, Hittable, HittableStruct, AABB};
 use crate::vec3::Vec3;
 
 use std::boxed::Box;
@@ -6,11 +6,11 @@ use std::boxed::Box;
 #[derive(Debug, Clone)]
 pub struct Translation {
     offset: Vec3,
-    ptr: Box<HittableEnum>,
+    ptr: Box<HittableStruct>,
 }
 
 impl Translation {
-    pub fn new(ptr: HittableEnum, offset: Vec3) -> Self {
+    pub fn new(ptr: HittableStruct, offset: Vec3) -> Self {
         Translation {
             ptr: Box::new(ptr),
             offset,

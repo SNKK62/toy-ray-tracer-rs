@@ -23,7 +23,7 @@ impl Ray {
     pub fn color(
         &self,
         background: &vec3::Color,
-        world: &hittable::HittableEnum,
+        world: &hittable::HittableStruct,
         depth: usize,
     ) -> vec3::Color {
         if depth == 0 {

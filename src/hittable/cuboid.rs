@@ -1,5 +1,7 @@
-use super::{HitRecord, Hittable, HittableEnum, HittableList, XYRect, XZRect, YZRect, AABB};
-use crate::material::MaterialEnum;
+use super::{
+    HitRecord, Hittable, HittableKey, HittableList, HittableStruct, XYRect, XZRect, YZRect, AABB,
+};
+use crate::material::MaterialStruct;
 use crate::vec3::Point3;
 
 #[derive(Debug, Clone)]
@@ -10,56 +12,68 @@ pub struct Cuboid {
 }
 
 impl Cuboid {
-    pub fn new(p0: &Point3, p1: &Point3, mat: MaterialEnum) -> Self {
+    pub fn new(p0: &Point3, p1: &Point3, mat: MaterialStruct) -> Self {
         let mut sides = HittableList::new();
-        sides.add(HittableEnum::XYRect(XYRect::new(
+        let mut obj = HittableStruct::new(HittableKey::XYRect);
+        obj.xy_rect = Some(XYRect::new(
             p0.x(),
             p1.x(),
             p0.y(),
             p1.y(),
             p1.z(),
             mat.clone(),
-        )));
-        sides.add(HittableEnum::XYRect(XYRect::new(
+        ));
+        sides.add(obj);
+        let mut obj = HittableStruct::new(HittableKey::XYRect);
+        obj.xy_rect = Some(XYRect::new(
             p0.x(),
             p1.x(),
             p0.y(),
             p1.y(),
             p0.z(),
             mat.clone(),
-        )));
-        sides.add(HittableEnum::XZRect(XZRect::new(
+        ));
+        sides.add(obj);
+        let mut obj = HittableStruct::new(HittableKey::XZRect);
+        obj.xz_rect = Some(XZRect::new(
             p0.x(),
             p1.x(),
             p0.z(),
             p1.z(),
             p1.y(),
             mat.clone(),
-        )));
-        sides.add(HittableEnum::XZRect(XZRect::new(
+        ));
+        sides.add(obj);
+        let mut obj = HittableStruct::new(HittableKey::XZRect);
+        obj.xz_rect = Some(XZRect::new(
             p0.x(),
             p1.x(),
             p0.z(),
             p1.z(),
             p0.y(),
             mat.clone(),
-        )));
-        sides.add(HittableEnum::YZRect(YZRect::new(
+        ));
+        sides.add(obj);
+        let mut obj = HittableStruct::new(HittableKey::YZRect);
+        obj.yz_rect = Some(YZRect::new(
             p0.y(),
             p1.y(),
             p0.z(),
             p1.z(),
             p1.x(),
             mat.clone(),
-        )));
-        sides.add(HittableEnum::YZRect(YZRect::new(
+        ));
+        sides.add(obj);
+        let mut obj = HittableStruct::new(HittableKey::YZRect);
+        obj.yz_rect = Some(YZRect::new(
             p0.y(),
             p1.y(),
             p0.z(),
             p1.z(),
             p0.x(),
             mat.clone(),
-        )));
+        ));
+        sides.add(obj);
 
         Cuboid {
             box_min: *p0,

@@ -1,22 +1,24 @@
-use super::{HitRecord, Hittable, HittableEnum, AABB};
-use crate::material::{Isotropic, MaterialEnum};
+use super::{HitRecord, Hittable, HittableStruct, AABB};
+use crate::material::{Isotropic, MaterialKey, MaterialStruct};
 use crate::ray::Ray;
-use crate::texture::TextureEnum;
+use crate::texture::TextureStruct;
 use crate::vec3::Vec3;
 use rand::Rng;
 
 #[derive(Debug, Clone)]
 pub struct ConstantMedium {
-    boundary: HittableEnum,
-    phase_function: MaterialEnum,
+    boundary: HittableStruct,
+    phase_function: MaterialStruct,
     neg_inv_density: f64,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: HittableEnum, density: f64, tex: TextureEnum) -> Self {
+    pub fn new(boundary: HittableStruct, density: f64, tex: TextureStruct) -> Self {
+        let mut phase_function = MaterialStruct::new(MaterialKey::Isotropic);
+        phase_function.isotropic = Some(Isotropic::new(&tex));
         Self {
             boundary,
-            phase_function: MaterialEnum::Isotropic(Isotropic::new(&tex)),
+            phase_function,
             neg_inv_density: -1.0 / density,
         }
     }

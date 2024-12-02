@@ -1,30 +1,36 @@
-use crate::hittable::{BvhNode, HittableEnum, HittableList, Sphere};
-use crate::material::{Lambertian, MaterialEnum};
-use crate::texture::{Checker, SolidColor, TextureEnum};
+use crate::hittable::{BvhNode, HittableKey, HittableStruct, Sphere};
+use crate::material::{Lambertian, MaterialKey, MaterialStruct};
+use crate::texture::{Checker, SolidColor, TextureKey, TextureStruct};
 use crate::vec3::{Color, Point3};
 
-pub fn scene() -> HittableEnum {
-    let mut world: Vec<HittableEnum> = Vec::new();
-    let checker = TextureEnum::Checker(Checker::new(
-        TextureEnum::SolidColor(SolidColor::new(Color::new(0.2, 0.3, 0.1))),
-        TextureEnum::SolidColor(SolidColor::new(Color::new(0.9, 0.9, 0.9))),
-    ));
+pub fn scene() -> HittableStruct {
+    let mut world: Vec<HittableStruct> = Vec::new();
+    let mut checker = TextureStruct::new(TextureKey::Checker);
+    let mut texture1 = TextureStruct::new(TextureKey::SolidColor);
+    texture1.solid_color = Some(SolidColor::new(Color::new(0.2, 0.3, 0.1)));
+    let mut texture2 = TextureStruct::new(TextureKey::SolidColor);
+    texture2.solid_color = Some(SolidColor::new(Color::new(0.9, 0.9, 0.9)));
+    checker.checker = Some(Checker::new(texture1, texture2));
 
-    let sphere_material = MaterialEnum::Lambertian(Lambertian::new(&checker));
-    world.push(HittableEnum::Sphere(Sphere::new(
+    let mut sphere_material = MaterialStruct::new(MaterialKey::Lambertian);
+    sphere_material.lambertian = Some(Lambertian::new(&checker));
+    let mut obj = HittableStruct::new(HittableKey::Sphere);
+    obj.sphere = Some(Sphere::new(
         &Point3::new(0.0, -10.0, 0.0),
         10.0,
         sphere_material.clone(),
-    )));
-    world.push(HittableEnum::Sphere(Sphere::new(
+    ));
+    world.push(obj);
+
+    let mut obj = HittableStruct::new(HittableKey::Sphere);
+    obj.sphere = Some(Sphere::new(
         &Point3::new(0.0, 10.0, 0.0),
         10.0,
         sphere_material.clone(),
-    )));
+    ));
+    world.push(obj);
 
-    let bvh = HittableEnum::BvhNode(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
-
-    let mut world = HittableList::new();
-    world.add(bvh);
-    HittableEnum::HittableList(Box::new(world))
+    let mut bvh = HittableStruct::new(HittableKey::BvhNode);
+    bvh.bvh_node = Some(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
+    bvh
 }

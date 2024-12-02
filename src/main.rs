@@ -1,6 +1,6 @@
 use image::RgbImage;
 use rand::Rng;
-use ray_tracer_rs::{camera, hittable::HittableEnum, progress, scenes, vec3};
+use ray_tracer_rs::{camera, hittable::HittableStruct, progress, scenes, vec3};
 use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Instant;
@@ -11,7 +11,7 @@ fn main() {
     // let width = 384;
     let width = 512;
     let height = (width as f64 / aspect_ratio) as usize;
-    let samples_per_pixel = 50;
+    let samples_per_pixel = 300;
     let max_depth = 100;
 
     // NOTE: The following code is for the camera position for random scenes
@@ -24,9 +24,10 @@ fn main() {
     let dist_to_focus = 10.0;
     let aperture = 0.0;
     let background = vec3::Color::zero();
+    // let background = vec3::Color::new(0.7, 0.8, 1.0);
 
     let pb = Arc::new(RwLock::new(progress::ProgressBar::new(width * height)));
-    let world: Arc<HittableEnum> = Arc::new(scenes::final_scene::scene());
+    let world: Arc<HittableStruct> = Arc::new(scenes::final_scene::scene());
     let cam = Arc::new(camera::Camera::new(
         lookfrom,
         lookat,

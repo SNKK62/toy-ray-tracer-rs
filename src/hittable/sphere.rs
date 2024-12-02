@@ -1,5 +1,5 @@
 use crate::hittable::{HitRecord, Hittable, AABB};
-use crate::material::MaterialEnum;
+use crate::material::MaterialStruct;
 use crate::ray;
 use crate::vec3;
 
@@ -7,11 +7,11 @@ use crate::vec3;
 pub struct Sphere {
     center: vec3::Point3,
     radius: f64,
-    material: MaterialEnum,
+    material: MaterialStruct,
 }
 
 impl Sphere {
-    pub fn new(center: &vec3::Point3, radius: f64, material: MaterialEnum) -> Self {
+    pub fn new(center: &vec3::Point3, radius: f64, material: MaterialStruct) -> Self {
         Self {
             center: *center,
             radius,

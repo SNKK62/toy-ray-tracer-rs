@@ -1,14 +1,14 @@
-use crate::texture::TextureEnum;
+use crate::texture::TextureStruct;
 use std::boxed::Box;
 
 #[derive(Debug, Clone)]
 pub struct Checker {
-    odd: Box<TextureEnum>,
-    even: Box<TextureEnum>,
+    odd: Box<TextureStruct>,
+    even: Box<TextureStruct>,
 }
 
 impl Checker {
-    pub fn new(odd: TextureEnum, even: TextureEnum) -> Self {
+    pub fn new(odd: TextureStruct, even: TextureStruct) -> Self {
         Self {
             odd: Box::new(odd),
             even: Box::new(even),

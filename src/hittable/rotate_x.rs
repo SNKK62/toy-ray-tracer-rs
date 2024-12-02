@@ -1,11 +1,11 @@
-use super::{HitRecord, Hittable, HittableEnum, AABB};
+use super::{HitRecord, Hittable, HittableStruct, AABB};
 use crate::degrees_to_radians;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 #[derive(Debug, Clone)]
 pub struct RotateX {
-    ptr: HittableEnum,
+    ptr: HittableStruct,
     sin_theta: f64,
     cos_theta: f64,
     hasbox: bool,
@@ -13,7 +13,7 @@ pub struct RotateX {
 }
 
 impl RotateX {
-    pub fn new(ptr: HittableEnum, angle: f64) -> Self {
+    pub fn new(ptr: HittableStruct, angle: f64) -> Self {
         let radians = degrees_to_radians(angle);
         let sin_theta = f64::sin(radians);
         let cos_theta = f64::cos(radians);
